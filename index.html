@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>Welcome To Rudra Reality</title>
+
+  <!-- External Scripts -->
+  <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.1.5/dist/mindar-image.prod.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.1.5/dist/mindar-image-aframe.prod.js"></script>
+  <script src="gesture-detector.js"></script>
+  <script src="gesture-handler.js"></script>
+
+</head>
+
+<body>
+
+  <!-- A-Frame Scene -->
+  <a-scene 
+    mindar-image="imageTargetSrc: wall.mind; filterMinCF: 0.0001; filterBeta: 1" 
+    color-space="sRGB" 
+    renderer="colorManagement: true, physicallyCorrectLights" 
+    vr-mode-ui="enabled: false" 
+    device-orientation-permission-ui="enabled: false"
+    gltf-model="dracoDecoderPath: https://www.gstatic.com/draco/v1/decoders/"
+    maxTrack="1"
+    gesture-detector>
+    
+    <!-- Assets -->
+    <a-assets>
+      <a-asset-item id="model1" src="sitar1.glb"></a-asset-item>
+    </a-assets>
+
+    <!-- Camera -->
+    <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+
+    <!-- Image Target and 3D Models -->
+    <a-entity mindar-image-target="targetIndex: 0" id="target1">
+      <a-entity
+        id="model1-entity"
+        gltf-model="#model1"
+        rotation="0 0 0"
+        position="0 -0.2 -0.5"
+        scale="0.1 0.1 0.1"
+        gesture-handler
+        animation-mixer
+      ></a-entity>
+    </a-entity>
+
+  </a-scene>
+
+</body>
+</html>
