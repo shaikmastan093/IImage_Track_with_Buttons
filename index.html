@@ -1,56 +1,156 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <title>Welcome To Rudra Reality</title>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>Welcome To Rudra Reality</title>
 
-  <!-- External Scripts -->
-  <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.1.5/dist/mindar-image.prod.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.1.5/dist/mindar-image-aframe.prod.js"></script>
-  <script src="gesture-detector.js"></script>
-  <script src="gesture-handler.js"></script>
+    <!-- A-Frame and MindAR Libraries -->
+    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.1.4/dist/mindar-image.prod.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.1.4/dist/mindar-image-aframe.prod.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v7.0.0/dist/aframe-extras.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
 
+    <!-- Gesture Control Scripts -->
+    <script src="gesture-detector.js"></script>
+    <script src="gesture-handler.js"></script>
+
+    <style>
+        /* Pop-up Styling */
+        .popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            width: 350px; /* Increased width */
+            height: 200px; /* Increased height */
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.6);
+            z-index: 1000;
+            text-align: center;
+        }
+        .popup img {
+            width: 60px;
+            height: 60px;
+            margin-bottom: 10px;
+        }
+        .popup p {
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+            margin: 10px 0;
+        }
+        .popup button {
+            margin-top: 15px;
+            padding: 8px 15px;
+            background: red;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .popup button:hover {
+            background: darkred;
+        }
+    </style>
 </head>
 
 <body>
 
-  <!-- A-Frame Scene -->
-  <a-scene 
-    mindar-image="imageTargetSrc: wall.mind; filterMinCF: 0.0001; filterBeta: 1" 
-    color-space="sRGB" 
-    renderer="colorManagement: true, physicallyCorrectLights" 
-    vr-mode-ui="enabled: false" 
-    device-orientation-permission-ui="enabled: false"
-    gltf-model="dracoDecoderPath: https://www.gstatic.com/draco/v1/decoders/"
-    maxTrack="1"
-    gesture-detector>
-    
-    <!-- Assets -->
-    <a-assets>
-      <a-asset-item id="model1" src="sitar1.glb"></a-asset-item>
-    </a-assets>
+    <!-- Pop-up Container -->
+    <div id="popup" class="popup">
+        <img id="popup-icon" src="" alt="Icon">
+        <p id="popup-text"></p>
+        <button onclick="closePopup()">Close</button>
+    </div>
 
-    <!-- Camera -->
-    <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+    <!-- A-Frame Scene -->
+    <a-scene 
+        mindar-image="imageTargetSrc: wall.mind; filterMinCF: 0.0001; filterBeta: 1"
+        color-space="sRGB"
+        renderer="colorManagement: true, physicallyCorrectLights: true"
+        vr-mode-ui="enabled: false"
+        device-orientation-permission-ui="enabled: false"
+        gltf-model="dracoDecoderPath: https://www.gstatic.com/draco/v1/decoders/"
+        maxTrack="1"
+        gesture-detector>
 
-    <!-- Image Target and 3D Models -->
-    <a-entity mindar-image-target="targetIndex: 0" id="target1">
-      <a-entity
-        id="model1-entity"
-        gltf-model="#model1"
-        rotation="0 -90 0"
-        position="0 -0.1 -0.3"
-        scale="0.1 0.1 0.1"
-        gesture-handler
-        animation-mixer
-      ></a-entity>
-    </a-entity>
+        <!-- Assets -->
+        <a-assets>
+            <a-asset-item id="model1" src="sitar1.glb"></a-asset-item>
+            <img id="linkedin-icon" src="image1.png" alt="LinkedIn Icon" />
+            <img id="email-icon" src="image2.png" alt="Email Icon" />
+        </a-assets>
 
-  </a-scene>
+        <!-- Camera -->
+        <a-camera 
+            position="0 0 0" 
+            look-controls="enabled: false"
+            cursor="fuse: false; rayOrigin: mouse;"
+            raycaster="far: 10000; objects: .clickable;">
+        </a-camera>
+
+        <!-- Image Target -->
+        <a-entity mindar-image-target="targetIndex: 0" id="target1">
+            
+            <!-- 3D Model -->
+            <a-entity
+                id="model1-entity"
+                gltf-model="#model1"
+                rotation="0 -90 0"
+                position="0 -0.1 -0.3"
+                scale="0.1 0.1 0.1"
+                gesture-handler
+                animation-mixer>
+            </a-entity>
+
+            <!-- Interactive Buttons -->
+            <a-entity position="0.5 -0.5 -0.05">
+                
+                <!-- LinkedIn Button -->
+                <a-image
+                    class="clickable"
+                    position="-0.5 0 0"
+                    width="0.3"
+                    height="0.3"
+                    src="#linkedin-icon"
+                    onclick="openPopup('LinkedIn', 'image1.png', 'Visit my LinkedIn profile at: https://www.linkedin.com/in/selvendran-nks')">
+                </a-image>
+
+                <!-- Email Button -->
+                <a-image
+                    class="clickable"
+                    position="-1 0 0"
+                    width="0.3"
+                    height="0.3"
+                    src="#email-icon"
+                    onclick="openPopup('Email', 'image2.png', 'Email me at: selvendran.s@infrazanalytics.com')">
+                </a-image>
+
+            </a-entity>
+
+        </a-entity>
+    </a-scene>
+
+    <!-- JavaScript for Pop-up -->
+    <script>
+        function openPopup(title, icon, text) {
+            document.getElementById("popup-icon").src = icon;
+            document.getElementById("popup-text").textContent = text;
+            document.getElementById("popup").style.display = "block";
+        }
+
+        function closePopup() {
+            document.getElementById("popup").style.display = "none";
+        }
+    </script>
 
 </body>
 </html>
