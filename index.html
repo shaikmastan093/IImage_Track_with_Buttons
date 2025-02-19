@@ -10,7 +10,6 @@
 
     <!-- A-Frame and MindAR Libraries -->
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
-
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v7.0.0/dist/aframe-extras.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.1.4/dist/mindar-image.prod.js"></script>
@@ -24,49 +23,81 @@
     <script src="gesture-handler.js"></script>
 
     <style>
-        /* Pop-up Styling */
-        .popup {
+        /* Button Styles */
+        .scan-buttons {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 999;
+            display: flex;
+            gap: 20px;
+        }
+        .scan-buttons img {
+            width: 120px;
+            height: 120px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .scan-buttons img:hover {
+            transform: scale(1.1);
+        }
+
+        /* Responsive Dialog Box */
+        .dialog-box {
             display: none;
             position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
+            width: 90%;
+            max-width: 350px;
             background: white;
-            width: 600px;
-            height: 400px;
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.6);
+            padding: 15px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
             z-index: 1000;
             text-align: center;
+            border-radius: 10px;
         }
-        .popup img {
-            width: 60px;
-            height: 60px;
-            margin-bottom: 10px;
+        .dialog-box img {
+            width: 100%;
+            max-height: 200px;
+            object-fit: contain;
+            border-radius: 10px;
         }
-        .popup p {
+        .dialog-box p {
             font-size: 16px;
-            font-weight: bold;
-            color: #333;
             margin: 10px 0;
+            word-wrap: break-word;
         }
-        .popup button {
-            margin-top: 70px;
-            padding: 8px 15px;
+        .close-btn {
             background: red;
             color: white;
             border: none;
-            border-radius: 5px;
+            padding: 10px 15px;
             cursor: pointer;
+            border-radius: 5px;
             font-size: 14px;
+            width: 100%;
         }
-        .popup button:hover {
+        .close-btn:hover {
             background: darkred;
+        }
+
+        /* Responsive Adjustments */
+        @media screen and (max-width: 600px) {
+            .dialog-box {
+                width: 95%;
+                max-width: 320px;
+            }
+            .dialog-box p {
+                font-size: 14px;
+            }
         }
     </style>
 </head>
 <body>
+
   <!-- Scanning Overlay for AR Image Detection -->
   <div id="example-scanning-overlay" class="hidden">
     <div class="inner">
@@ -74,89 +105,71 @@
       <div class="scanline"></div>
     </div>
   </div>
-  
-    <!-- Pop-up Container -->
-    <div id="popup" class="popup">
-        <img id="popup-icon" src="" alt="Icon">
-        <p id="popup-text"></p>
-        <button onclick="closePopup()">Close</button>
-    </div>
 
-    <!-- A-Frame Scene -->
-    <a-scene 
-        mindar-image="imageTargetSrc: wall.mind; filterMinCF: 0.0001; filterBeta: 1;  uiScanning: #example-scanning-overlay"
-        color-space="sRGB"
-        renderer="colorManagement: true, physicallyCorrectLights: true"
-        vr-mode-ui="enabled: false"
-        device-orientation-permission-ui="enabled: false"
-        gltf-model="dracoDecoderPath: https://www.gstatic.com/draco/v1/decoders/"
-        maxTrack="1"
-        gesture-detector>
+  <!-- Image Buttons -->
+  <div class="scan-buttons">
+    <img src="image1.png" alt="Button 1" onclick="showDialog('image1.png', 'This is the first button content.')" />
+    <img src="image2.png" alt="Button 2" onclick="showDialog('image2.png', 'This is the second button content.')" />
+  </div>
 
-        <!-- Assets -->
-        <a-assets>
-            <a-asset-item id="model1" src="sitar1.glb"></a-asset-item>
-            <img id="linkedin-icon" src="image1.png" alt="LinkedIn Icon" />
-            <img id="email-icon" src="image2.png" alt="Email Icon" />
-        </a-assets>
+  <!-- Dialog Box -->
+  <div id="dialogBox" class="dialog-box">
+      <img id="dialogImage" src="" alt="Dialog Image">
+      <p id="dialogText">Sample Text</p>
+      <button class="close-btn" onclick="closeDialog()">Close</button>
+  </div>
 
-        <!-- Camera -->
-        <a-camera 
-            position="0 0 0" 
-            look-controls="enabled: false"
-            cursor="fuse: false; rayOrigin: mouse;"
-            raycaster="far: 10000; objects: .clickable;">
-        </a-camera>
+  <!-- A-Frame Scene -->
+  <a-scene 
+      mindar-image="imageTargetSrc: wall.mind; filterMinCF: 0.0001; filterBeta: 1; uiScanning: #example-scanning-overlay"
+      color-space="sRGB"
+      renderer="colorManagement: true, physicallyCorrectLights: true"
+      vr-mode-ui="enabled: false"
+      device-orientation-permission-ui="enabled: false"
+      gltf-model="dracoDecoderPath: https://www.gstatic.com/draco/v1/decoders/"
+      maxTrack="1"
+      gesture-detector>
 
-        <!-- Image Target -->
-        <a-entity mindar-image-target="targetIndex: 0" id="target1">
-            <!-- 3D Model -->
-            <a-entity
-                id="model1-entity"
-                gltf-model="#model1"
-                rotation="0 -90 0"
-                position="0 -0.1 -0.3"
-                scale="0.1 0.1 0.1"
-                gesture-handler
-                animation-mixer>
-            </a-entity>
+      <!-- Assets -->
+      <a-assets>
+          <a-asset-item id="model1" src="sitar1.glb"></a-asset-item>
+      </a-assets>
 
-            <!-- Interactive Buttons -->
-            <a-entity position="0.5 -0.5 -0.05">
-                <!-- LinkedIn Button -->
-                <a-image
-                    class="clickable"
-                    position="-0.5 0 0"
-                    width="0.3"
-                    height="0.3"
-                    src="#linkedin-icon"
-                    onclick="openPopup('LinkedIn', 'image1.png', 'Visit my LinkedIn profile at: https://www.linkedin.com/in/selvendran-nks')">
-                </a-image>
+      <!-- Camera -->
+      <a-camera 
+          position="0 0 0" 
+          look-controls="enabled: false"
+          cursor="fuse: false; rayOrigin: mouse;"
+          raycaster="far: 10000; objects: .clickable;">
+      </a-camera>
 
-                <!-- Email Button -->
-                <a-image
-                    class="clickable"
-                    position="-1 0 0"
-                    width="0.3"
-                    height="0.3"
-                    src="#email-icon"
-                    onclick="openPopup('Email', 'image2.png', 'Email me at: selvendran.s@infrazanalytics.com')">
-                </a-image>
-            </a-entity>
-        </a-entity>
-    </a-scene>
+      <!-- Image Target -->
+      <a-entity mindar-image-target="targetIndex: 0" id="target1">
+          <!-- 3D Model -->
+          <a-entity
+              id="model1-entity"
+              gltf-model="#model1"
+              rotation="0 -90 0"
+              position="0 -0.1 -0.3"
+              scale="0.1 0.1 0.1"
+              gesture-handler
+              animation-mixer>
+          </a-entity>
+      </a-entity>
+  </a-scene>
 
-    <!-- JavaScript for Pop-up -->
-    <script>
-        function openPopup(title, icon, text) {
-            document.getElementById("popup-icon").src = icon;
-            document.getElementById("popup-text").textContent = text;
-            document.getElementById("popup").style.display = "block";
-        }
+  <!-- JavaScript -->
+  <script>
+      function showDialog(imageSrc, textContent) {
+          document.getElementById("dialogImage").src = imageSrc;
+          document.getElementById("dialogText").innerText = textContent;
+          document.getElementById("dialogBox").style.display = "block";
+      }
 
-        function closePopup() {
-            document.getElementById("popup").style.display = "none";
-        }
-    </script>
+      function closeDialog() {
+          document.getElementById("dialogBox").style.display = "none";
+      }
+  </script>
+
 </body>
 </html>
