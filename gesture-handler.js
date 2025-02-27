@@ -105,7 +105,7 @@ AFRAME.registerComponent("gesture-handler", {
   handleRotation: function (event) {
     if (!this.isVisible) return;
 
-    const rotationSpeed = this.data.rotationFactor * 0.09; // Adjust for smoother rotation
+    const rotationSpeed = this.data.rotationFactor * 10; // Adjust for smoother rotation
 
     this.el.object3D.rotation.y -= event.detail.positionChange.x * rotationSpeed;
     this.el.object3D.rotation.x += event.detail.positionChange.y * rotationSpeed;
